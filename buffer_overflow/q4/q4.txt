@@ -1,0 +1,35 @@
+q4.txt
+
+1. The vulnerability in this part was the for loop that accessed i upto 64 (i
+   <= 64) because this is an off-by-one error since i started from 0. 
+
+2. We can exploit this vulnerability by overwriting the EBP, our saved frame
+   pointer! (A good reference here:
+   http://www.exploit-db.com/wp-content/themes/exploit/docs/28478.pdf)
+   Since our buffer was given a size 64, we can fill the buffer with
+   16 times where each byte represents the new eip you want to jump to that
+   will spawn a new shell and give us access to jz's credentials. From what we
+   saw, the ordering of the stack goes like this. Current return address, then
+   the buffer size 64, EBP, then the return address of the parent function. The
+   EBP's address was very similiar to addresses within our buffer so all we
+   needed to do was change the last 2 bits so that it points back to the
+   buffer. And since our buffer was filled with a new address, that is what
+   this function would return to.
+
+3. This is a sketch of our solution. 
+
+>invoke -d -e egg=$(./egg) agent-brown $(./arg)
+ The egg just prints the shellcode, the arg prints
+ buffer = "new_eip (0xbfffff9a)" + "\xii(88)"(ii is somewhere within buffer's address and points back to buffer)
+ Since in the code the input was ^ (1u << 5) we had to XOR the correct bits. 
+ new_eip = 0x9f/df/df/ba, \x88 = \xa8.
+ (http://www.garykessler.net/library/byte_logic_table.html)
+
+ (gdb)break invoke
+ (gdb)run
+ (gdb)x/s *((char **) environ)  ...this is what we used to find the address of
+ the environment variable egg, which we set when we invoke -d ...
+
+ Then same as before we used printed out buffer and frame to examine that what
+ we were doing was correct. Then we ./exploit and cat README to get jz's
+ username and password!

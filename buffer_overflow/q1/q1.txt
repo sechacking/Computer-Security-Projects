@@ -1,0 +1,22 @@
+So to start off you start the VM.
+Then on your local terminal you check which ip are open and can be scanned.
+	ifconfig
+This will show: 
+	vboxnet0: flags=8943<UP,BROADCAST,RUNNING,PROMISC,SIMPLEX,MULTICAST> mtu 1500
+		ether 0a:00:27:00:00:00 
+		inet 192.168.56.1 netmask 0xffffff00 broadcast 192.168.56.255 
+With the inet IP address 192.168.56.1 you are going to do a subnet mask scan. 
+	nmap 192.168.56.1/24
+This will show an open port and the IP address that you are going to use to get into the VM
+	192.168.56.101 open 
+	21/tcp open  ftp
+Then you use netcat
+	nc 192.168.56.101 21
+This will show the welcome message and you type
+	USER dana:)
+	PASS whatever
+Then you can type 
+	nc 192.168.56.101 6200
+Which will give you entrance into the VM. 
+Then you can ls and see which directories are there and start and exploiting it. 
+

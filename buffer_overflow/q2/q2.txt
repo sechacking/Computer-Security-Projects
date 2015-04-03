@@ -1,0 +1,28 @@
+q1.txt Dana Mun
+
+1. Vulnerability: The vulnerable part in the dejavu.c was where you gets(door).
+   This allows a hacker to write malicious code in the stdin, allowing them to
+   jump to a new location where in our case we spawned a new shell to hack into
+   smith. 
+   
+2. How it could be exploited: We exploited this vulnerability by jumping to a
+   new eip, then putting the a new shellcode there which was give to us.
+   
+3. Walkthrough of our solution: First we used gdb. 
+>invoke -d dejavu
+
+(gdb) break deja_vu
+(gdb) r 
+(gdb) n 
+AAAA
+(gdb) info frame -->this let us discover the ret address to be over written
+which was placed in the 0xbfff75c stack frame.
+(gdb) print &door -->this let us discover where the buffer started. Then we
+subtract 5c-48 = 20. Which means we need to over write the stack with 20 bytes. 
+
+So our egg python script basically prints a buffer that has
+buffer = "\x90 .....(repeat 20 times)" + new_eip(0xbffff75c+4=0xbfff760) + shellcode
+
+Then we call ./exploit and cat README and it should show credentials for user
+smith!!!!
+

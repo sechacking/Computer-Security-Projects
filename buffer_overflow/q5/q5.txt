@@ -1,0 +1,27 @@
+q5.txt
+
+1. The vulnerability we found was at in the function handle, when it calls to
+   io, the buffer gets overflowed and you are able to change the return
+   address. 
+
+2. Since now the ASLR (address layout randomization) is enabled we have to use
+   a different method so that our bind_shell code is properly ran. In section
+   8.3 re2esp of the reading, we notice that we can overflow our eip to jump to
+   a jmp *esp, which is a pointer back to our stack, so that our malicious code
+   can be run. You find that address by calling disas magic and looking for the addr
+   with 0xe4ff... and type x/i addr and keep adding one to the last bit to
+   finally find the addr to jmp *esp.
+
+3. To overflow the buffer, we set the break at the function handle and
+   calculated the difference between the eip and the start of the buffer, which
+   you can get by callig "info frame" and "print &buf". In our egg shell we
+   print out a buffer that will = "\x90... (6988 times)" + "new_eip (somewhere
+   in magic jmp *esp)" + bind_shell. 
+
+   The jmp *esp is a pointer to the top of the stack, which means it will
+   always point to a place after the return address. By changing our eip to
+   jump to this address, ensures that the instruction flow comes back to after
+   the eip where our bind_shell was injected. 
+
+   Then finally into exploit we add the last line to be nc 127.0.0.1 6666
+   and call ./exploit. This should spawn a new shell. 
