@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+./generate_rsa_pair.c
+
+cat q1_privkey.priv

@@ -1,0 +1,16 @@
+a) A description of the procedure you used to obtain the secret.
+
+We know the seed function is deterministic so we execute a for loop from int i = 0 to a large number, 10000, around the creation of RSA pairs to brute force them.
+
+When the server's public key matches the generated rsa's public key, the private key is output to stdout (as well as the public key).
+
+We obtain the secret exactly how we did in q0: Insert the brute-forced private key into Wireshark's SSL RSA key list. The secret is then easily obtained as plain text in the HTTP GET response.
+
+
+b) The line number of the line in the original generate_rsa_pair.c that doesn't do what the comment above the line states. Discuss whether or not (and why) fixing this line so it does what the comment says it should will make this key generation scheme be secure.
+
+The vulnerability is in line number 148: seed = time_micro_sec >> 7
+
+In any event, generate_rsa_pair.c is vulnerable because the seeding function, at most,  is determined by 0 to 1,000,000 possible values in a second. Rather than re-assigning the value of the seed variable to time_micro_sec >> 7, the code should, in order to do what the comment says, increase the value by time_micro_sec >> 7. However, this modification still would not make the scheme secure because the system time can be found, and because the random number generators that truly produce random results cannot be seeded.
+
+Reference: https://www.securecoding.cert.org/confluence/display/c/MSC32-C.+Properly+seed+pseudorandom+number+generators

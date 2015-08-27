@@ -1,0 +1,28 @@
+**** q0 Explanation ****
+
+a) A description of the procedure you used to obtain the secret.
+
+We inserted the private key into Wireshark to decrypt the packets. After that, discovering
+the secret was simple because we immediately noticed a HTTP GET to /secret.html. We looked at
+the response in packet 12 and noticed our secret had been sent back as plaintext.
+
+
+b) A list of cryptographic algorithms that were used for this TLS connection. For
+each algorithm, describe in one sentence its use in the protocol.
+
+1. TLS_RSA_WITH_AES_256_CBC_SHA         - 256 bit encryption 
+2. TLS_RSA_WITH_CAMELLIA_256_CBC_SHA    -  
+3. TLS_RSA_WITH_3DES_EDE_CBC_SHA
+4. TLS_RSA_WITH_AES_128_CBC_SHA         - 128 bit encryption
+5. TLS_RSA_WITH_CAMELLIA_128_CBC_SHA
+6. TLS_EMPTY_RENEGOTIATION_INFO_SCSV
+
+
+c) A discussion of whether there was any technical way by which you could have
+been prevented from decrypting the conversation even though you have ob-
+tained the private key. If so, briefly describe the technical approach. If not,
+explain why no such approach is feasible.
+
+The private key needs to be kept a secret for a reason. If someone is able to discover your
+private key then they are able to see decrypt all communication between the user in this
+cryptography scheme.
